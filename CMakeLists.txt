@@ -3,4 +3,4 @@ project(deepdrone_control)
 
 find_package(catkin REQUIRED std_msgs cv_bridge)
 
-# catkin_python_setup()
+catkin_package()
