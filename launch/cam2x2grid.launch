@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="video" default="0" />
+    <arg name="video_width" default="640" />
+    <arg name="video_height" default="480" />
+    <arg name="video_path" default="/home/ildoonet/Documents/grid.avi" />
+
+    <node name="cv_camera" pkg="cv_camera" type="cv_camera_node" output="screen" required="true">
+  </node>
+
+    <node name="video_recorder" pkg="video_recorder" type="recorder.py" output="screen" required="true">
+
+        <param name="output_width" type="int" value="640" />
+        <param name="output_height" type="int" value="480" />
+        <param name="output_path" value="$(arg video_path)" />
+
+        <param name="source1" value="/cv_camera/image_raw,0,0,320,240" />
+        <param name="source2" value="/cv_camera/image_raw,320,0,320,240" />
+        <param name="source3" value="/cv_camera/image_raw,0,240,320,240" />
+        <!--<param name="source4" value="/cv_camera/image_raw,320,240,320,240" />-->
+
+    </node>
+
+</launch>
