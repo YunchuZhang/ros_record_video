@@ -32,5 +32,5 @@ This node use opencv to save video, subscribe multiple image-publishing nodes.
 ### Examples
 
 #### 2 by 2 Grid with 3 Camera/Image Topics
-![2x2 grid sample](/samples/2x2grid1.png)
+![2x2 grid sample](/samples/2x2grid.png)
 
