@@ -53,6 +53,8 @@ class VideoRecorder:
         self.frame_wrappers = []
         self.start_time = -1
         self.end_time = -1
+        self.pub_img = None
+        self.bridge = CvBridge()
 
         self.fps = output_fps
         self.interval = 1.0 / self.fps
@@ -72,6 +74,12 @@ class VideoRecorder:
     def add_subscription(self, subscription):
         self.frame_wrappers.append(subscription)
 
+    def set_broadcast(self, publish_topic):
+        if not publish_topic:
+            self.pub_img = None
+        else:
+            self.pub_img = rospy.Publisher(publish_topic, Image, queue_size=1)
+
     def start_record(self):
         self.start_time = time.time()
         curr_time = self.start_time
@@ -86,9 +94,15 @@ class VideoRecorder:
 
                     resized = cv2.resize(f, (frame_w.target_w, frame_w.target_h))
                     canvas[frame_w.target_y:frame_w.target_y+frame_w.target_h, frame_w.target_x:frame_w.target_x+frame_w.target_w] = resized
-                    rospy.sleep(0.01)
+                    # rospy.sleep(0.01)
 
                 self.video_writer.write(canvas)
+                if self.pub_img:
+                    try:
+                        self.pub_img.publish(self.bridge.cv2_to_imgmsg(canvas, 'bgr8'))
+                    except CvBridgeError as e:
+                        rospy.logerr('cvbridgeerror, e={}'.format(str(e)))
+                        pass
                 rospy.sleep(0.01)
 
                 if rospy.is_shutdown() and self.end_time < 0:
@@ -117,6 +131,7 @@ if __name__ == '__main__':
     output_height = int(rospy.get_param('~output_height', '480'))
     output_fps = int(rospy.get_param('~output_fps', '30'))
     output_format = rospy.get_param('~output_format', 'xvid')
+    output_topic = rospy.get_param('~output_topic', '')
     output_path = rospy.get_param('~output_path', '')
     output_path = output_path.replace('[timestamp]', datetime.datetime.now().strftime("%Y%m%d_%H%M%S"))
     num_videos = int(rospy.get_param('~num_videos', '1000'))
@@ -140,6 +155,9 @@ if __name__ == '__main__':
 
         vf = VideoFrames(source_topic, target_x, target_y, target_w, target_h)
         ft.add_subscription(vf)
+
+    if output_topic:
+        ft.set_broadcast(output_topic)
 
     # recording.
     try:

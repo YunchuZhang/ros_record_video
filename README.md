@@ -27,6 +27,7 @@ This node use opencv to save video, subscribe multiple image-publishing nodes.
 + ~output_format(str: default xvid) : Output video format in fourcc format. See [FourCC Identifier](https://www.fourcc.org/codecs.php)
 + ~output_path(str) : Output Video File Path. eg: /home/ildoonet/Documents/video.mp4
   + [timestamp] : will be replaced with real timestamp. eg. grid_[timestamp].mp4 ---> grid_20170626_185926.mp4
++ ~output_topic(str) : Broadcast Output Video, if provided. eg. /image_recorder/image_raw
 
 + ~source1(str) : Incoming Video Frame Info in Format(topic,target_x,target_y,target_w,target_h)
   + eg: "/cv_camera/image_raw,0,0,320,240"
@@ -47,18 +48,16 @@ This node use opencv to save video, subscribe multiple image-publishing nodes.
     <param name="output_height" type="int" value="480" />
     <param name="output_path" value="/workdir/result.avi" />
 
+    <param name="output_topic" value="$(arg video_topic)" />
+
     <param name="source1" value="/videofile/image_raw,0,0,320,240" />         <!-- left-top -->
     <param name="source2" value="/openpose/image_raw,320,0,320,240" />        <!-- right-top -->
     <param name="source3" value="/deepdrone/facetrack_img,0,240,320,240" />   <!-- right-bottom -->
 
 </node>
-```
 
-### Tips
-
-+ Install H264 Codec for Ubuntu
- 
-```
-$ sudo apt-get install ubuntu-restricted-extras
-$ sudo apt-get install libavcodec54 libav-tools ffmpeg
+<node name="image_view_grid" pkg="image_view" type="image_view" respawn="false" output="screen" required="true">
+    <remap from="image" to="$(arg video_topic)"/>
+    <param name="autosize" value="true" />
+</node>
 ```
