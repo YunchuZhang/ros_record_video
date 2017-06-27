@@ -49,7 +49,7 @@ This node use opencv to save video, subscribe multiple image-publishing nodes.
 
     <param name="source1" value="/videofile/image_raw,0,0,320,240" />         <!-- left-top -->
     <param name="source2" value="/openpose/image_raw,320,0,320,240" />        <!-- right-top -->
-    <param name="source3" value="/deepdrone/facetrack_img,0,240,320,240" /> . <!-- right-bottom -->
+    <param name="source3" value="/deepdrone/facetrack_img,0,240,320,240" />   <!-- right-bottom -->
 
 </node>
 ```
