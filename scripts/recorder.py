@@ -2,12 +2,22 @@
 from __future__ import print_function
 import cv2
 import numpy as np
+import datetime
 import time
 
 import rospy
 
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
+
+
+def opencv_version():
+    v = cv2.__version__.split('.')[0]
+    if v == '2':
+        return 2
+    elif v == '3':
+        return 3
+    raise Exception('opencv version can not be parsed. v={}'.format(v))
 
 
 class VideoFrames:
@@ -49,8 +59,14 @@ class VideoRecorder:
         self.output_width = output_width
         self.output_height = output_height
 
-        # output
-        fourcc = cv2.cv.FOURCC(*output_format)
+        if opencv_version() == 2:
+            fourcc = cv2.cv.FOURCC(*output_format)
+        elif opencv_version() == 3:
+            fourcc = cv2.VideoWriter_fourcc(*output_format)
+        else:
+            raise
+
+        self.output_path = output_path
         self.video_writer = cv2.VideoWriter(output_path, fourcc, output_fps, (output_width, output_height))
 
     def add_subscription(self, subscription):
@@ -89,7 +105,7 @@ class VideoRecorder:
         self.video_writer.release()
 
     def terminate(self):
-        rospy.loginfo("[ros-video-recorder] Video Saved.")
+        rospy.loginfo("[ros-video-recorder] Video Saved. path={}".format(self.output_path))
         self.end_time = time.time()
 
 
@@ -102,6 +118,7 @@ if __name__ == '__main__':
     output_fps = int(rospy.get_param('~output_fps', '30'))
     output_format = rospy.get_param('~output_format', 'xvid')
     output_path = rospy.get_param('~output_path', '')
+    output_path = output_path.replace('[timestamp]', datetime.datetime.now().strftime("%Y%m%d_%H%M%S"))
     num_videos = int(rospy.get_param('~num_videos', '1000'))
 
     assert output_format, 'error. output_path is not provided.'
@@ -109,7 +126,7 @@ if __name__ == '__main__':
     ft = VideoRecorder(output_width, output_height, output_fps, output_format, output_path)
 
     # get parameters for videos and initialize subscriptions
-    for idx in range(1000):
+    for idx in range(num_videos):
         source_info = rospy.get_param('~source%d' % (idx+1), '')
         if not source_info:
             break
