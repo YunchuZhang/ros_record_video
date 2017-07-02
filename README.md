@@ -61,3 +61,27 @@ This node use opencv to save video, subscribe multiple image-publishing nodes.
     <param name="autosize" value="true" />
 </node>
 ```
+
+![3x3 grid sample - not same size](/samples/3x3grid_multi_size.png)
+
+```xml
+<node name="video_recorder" pkg="video_recorder" type="recorder.py" output="screen" required="true">
+
+    <param name="output_width" type="int" value="640" />
+    <param name="output_height" type="int" value="480" />
+    <param name="output_path" value="/workdir/result.avi" />
+
+    <param name="output_topic" value="$(arg video_topic)" />
+
+    <param name="source1" value="/videofile/image_raw,0,0,640,480" />         <!-- left-top with big size(640x480) -->
+    <param name="source2" value="/openpose/image_raw,640,0,320,240" />        <!-- right-top (320x240) -->
+    <param name="source3" value="/deepdrone/facetrack_img,640,240,320,240" />   <!-- right-bottom (320x240) -->
+    <param name="source4" value="/deepdrone/tracking_img,0,480,320,240" />    <!-- left-bottom (320x240) -->
+
+</node>
+
+<node name="image_view_grid" pkg="image_view" type="image_view" respawn="false" output="screen" required="true">
+    <remap from="image" to="$(arg video_topic)"/>
+    <param name="autosize" value="true" />
+</node>
+```
