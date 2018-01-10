@@ -69,7 +69,11 @@ class VideoRecorder:
             raise
 
         self.output_path = output_path
-        self.video_writer = cv2.VideoWriter(output_path, fourcc, output_fps, (output_width, output_height))
+        
+        if self.output_path:
+            self.video_writer = cv2.VideoWriter(output_path, fourcc, output_fps, (output_width, output_height))
+        else:
+            self.video_writer = None
 
     def add_subscription(self, subscription):
         self.frame_wrappers.append(subscription)
@@ -96,7 +100,8 @@ class VideoRecorder:
                     canvas[frame_w.target_y:frame_w.target_y+frame_w.target_h, frame_w.target_x:frame_w.target_x+frame_w.target_w] = resized
                     # rospy.sleep(0.01)
 
-                self.video_writer.write(canvas)
+                if self.video_writer:
+                    self.video_writer.write(canvas)
                 if self.pub_img:
                     try:
                         self.pub_img.publish(self.bridge.cv2_to_imgmsg(canvas, 'bgr8'))
@@ -116,7 +121,8 @@ class VideoRecorder:
                 self.terminate()
                 continue
 
-        self.video_writer.release()
+        if self.video_writer:
+            self.video_writer.release()
 
     def terminate(self):
         rospy.loginfo("[ros-video-recorder] Video Saved. path={}".format(self.output_path))
@@ -135,8 +141,6 @@ if __name__ == '__main__':
     output_path = rospy.get_param('~output_path', '')
     output_path = output_path.replace('[timestamp]', datetime.datetime.now().strftime("%Y%m%d_%H%M%S"))
     num_videos = int(rospy.get_param('~num_videos', '1000'))
-
-    assert output_format, 'error. output_path is not provided.'
 
     ft = VideoRecorder(output_width, output_height, output_fps, output_format, output_path)
 
