@@ -61,13 +61,14 @@ class VideoRecorder:
         self.output_width = output_width
         self.output_height = output_height
 
-        if opencv_version() == 2:
-            fourcc = cv2.cv.FOURCC(*output_format)
-        elif opencv_version() == 3:
-            fourcc = cv2.VideoWriter_fourcc(*output_format)
-        else:
-            raise
+        # if opencv_version() == 2:
+        #     fourcc = cv2.cv.FOURCC(*output_format)
+        # elif opencv_version() == 3:
+        #     fourcc = cv2.VideoWriter_fourcc(*output_format)
 
+
+
+        fourcc = cv2.VideoWriter_fourcc('M','J','P','G')
         self.output_path = output_path
         
         if self.output_path:
@@ -133,8 +134,8 @@ if __name__ == '__main__':
     rospy.init_node('video_recorder', anonymous=True)
 
     # parameters
-    output_width = int(rospy.get_param('~output_width', '640'))
-    output_height = int(rospy.get_param('~output_height', '480'))
+    output_width = int(rospy.get_param('~output_width', '1080'))
+    output_height = int(rospy.get_param('~output_height', '640'))
     output_fps = int(rospy.get_param('~output_fps', '30'))
     output_format = rospy.get_param('~output_format', 'xvid')
     output_topic = rospy.get_param('~output_topic', '')

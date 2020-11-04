@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="video" default="0" />
+    <arg name="video_width" default="1080" />
+    <arg name="video_height" default="720" />
+    <!-- <arg name="video_codec" default="mp42" /> -->
+    <arg name="video_path" default="/home/nel/franka/grid_[timestamp].avi" />
+    <arg name="video_topic" default="/video_recorder/image_raw" />
+
+
+
+    <node name="video_recorder" pkg="video_recorder" type="recorder.py" output="screen" required="true">
+
+        <param name="output_width" type="int" value="1080" />
+        <param name="output_height" type="int" value="720" />
+        <!-- <param name="output_format" value="$(arg video_codec)" /> -->
+        <param name="output_path" value="$(arg video_path)" />
+
+        <!-- <param name="output_topic" value="$(arg video_topic)" /> -->
+        <param name="source1" value="/camera1/color/image_raw,0,0,540,360" />
+        <param name="source2" value="/camera2/color/image_raw,540,0,540,360" />
+        <param name="source3" value="/camera3/color/image_raw,0,360,540,360" />
+        <param name="source4" value="/camera4/color/image_raw,540,360,540,360" />
+    </node>
+
+    <node name="image_view_grid" pkg="image_view" type="image_view" respawn="false" output="screen" required="true">
+        <remap from="image" to="$(arg video_topic)"/>
+        <param name="autosize" value="true" />
+    </node>
+
+</launch>
