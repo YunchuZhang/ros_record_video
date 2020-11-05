@@ -1,7 +1,10 @@
 # ros-image-recorder
 
 Image Record Package for ROS.
-
+Forks from:
+https://github.com/ildoonet/ros-video-recorder
+ 
+ Thanks the author!
 ## Why is this ros package special?
  
 1. Images shouldn't have to be published in a precise interval.
